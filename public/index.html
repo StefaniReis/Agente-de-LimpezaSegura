@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#085041">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Limpeza Segura</title>
+
+<!-- SDK do Telegram Mini App — OBRIGATÓRIO -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<!-- Ícones -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+
+<style>
+:root {
+  --green: #085041;
+  --green-l: #E1F5EE;
+  --red: #A32D2D;
+  --red-l: #FCEBEB;
+  --yel-l: #FFF8E1;
+  --bg: #ffffff;
+  --bg2: #f5f5f5;
+  --text: #1a1a1a;
+  --text2: #666;
+  --text3: #999;
+  --border: #e0e0e0;
+  --border2: #ccc;
+  --r: 12px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:#121212; --bg2:#1e1e1e;
+    --text:#f0f0f0; --text2:#aaa; --text3:#666;
+    --border:#333; --border2:#444;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);height:100vh;overflow:hidden}
+#app{display:flex;flex-direction:column;height:100vh;max-width:500px;margin:0 auto;background:var(--bg);position:relative}
+#hdr{background:var(--green);padding:12px 14px 10px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+#hdr .logo{width:34px;height:34px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#hdr h1{font-size:14px;font-weight:600;color:white}
+#hdr p{font-size:9.5px;opacity:.75;color:white}
+#tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg)}
+.tab{flex:1;padding:9px 2px;text-align:center;font-size:9.5px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;display:flex;flex-direction:column;align-items:center;gap:2px;transition:all .15s;-webkit-tap-highlight-color:transparent}
+.tab i{font-size:16px}
+.tab.active{color:var(--green);border-bottom-color:var(--green);font-weight:600}
+.tab.red{color:var(--red)}.tab.red.active{border-bottom-color:var(--red);color:var(--red)}
+.sec{display:none;flex:1;overflow:hidden;flex-direction:column}.sec.show{display:flex}
+.scroll{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch}
+.msg{max-width:88%;padding:9px 12px;border-radius:16px;font-size:13px;line-height:1.55}
+.msg.user{align-self:flex-end;background:var(--green);color:white;border-bottom-right-radius:4px}
+.msg.ai{align-self:flex-start;background:var(--bg2);color:var(--text);border-bottom-left-radius:4px;border:1px solid var(--border)}
+.msg.ai .lbl{font-size:9px;font-weight:700;color:var(--green);margin-bottom:3px;display:block}
+.msg.photo{background:transparent;padding:0;border:none}
+.msg.photo img{max-width:200px;border-radius:12px;display:block;border:2px solid var(--green)}
+.typing{display:flex;gap:4px;align-items:center;padding:10px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:bl 1.2s infinite}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes bl{0%,60%,100%{opacity:.3}30%{opacity:1}}
+#hb{background:#F0FBF6;border-bottom:1px solid #B2DFDB;padding:7px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+#hbt{font-size:11.5px;color:var(--green);flex:1;font-weight:500}
+#hb button{font-size:10px;background:var(--green);color:white;border:none;border-radius:20px;padding:3px 9px;cursor:pointer;font-family:var(--font)}
+.toast{background:#E1F5EE;border:1px solid #A5D6A7;border-radius:10px;padding:8px 11px;font-size:11.5px;color:var(--green);display:flex;align-items:flex-start;gap:7px;margin:0 12px 4px;flex-shrink:0}
+.pcard{background:var(--yel-l);border:1px solid #FFE082;border-radius:10px;padding:9px 11px;font-size:11.5px;color:#856404;margin:0 12px 4px;flex-shrink:0}
+.pcard strong{display:flex;align-items:center;gap:5px;margin-bottom:5px}
+.ph{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.phb{background:var(--green);color:white;border:none;border-radius:20px;padding:4px 11px;font-size:11px;cursor:pointer;font-family:var(--font)}
+.phb.skip{background:var(--bg2);color:var(--text2);border:1px solid var(--border)}
+#chips{display:flex;flex-wrap:wrap;gap:5px;padding:0 12px 7px;flex-shrink:0}
+.chip{background:var(--green-l);color:var(--green);font-size:11px;padding:5px 10px;border-radius:20px;cursor:pointer;border:none;font-family:var(--font);-webkit-tap-highlight-color:transparent}
+.chip.red{background:var(--red-l);color:var(--red)}
+#ir{padding:8px 10px;border-top:1px solid var(--border);display:flex;gap:5px;align-items:flex-end;flex-shrink:0;background:var(--bg)}
+#cb{width:36px;height:36px;border-radius:50%;background:var(--bg2);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text2)}
+#mi{flex:1;border:1px solid var(--border2);border-radius:20px;padding:8px 12px;font-size:13px;resize:none;max-height:75px;background:var(--bg2);color:var(--text);outline:none;font-family:var(--font)}
+#mi:focus{border-color:var(--green)}
+#sb{width:36px;height:36px;border-radius:50%;background:var(--green);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#sb:disabled{opacity:.4}
+input[type=file]{display:none}
+.sos-btn{background:var(--red);color:white;border:none;border-radius:var(--r);padding:15px;font-size:15px;font-weight:700;cursor:pointer;width:100%;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:9px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px}
+.card h3{font-size:12.5px;font-weight:600;margin-bottom:8px;color:var(--text);display:flex;align-items:center;gap:6px}
+.aid{margin-bottom:7px}.aid:last-child{margin:0}
+.aid .s{font-size:12.5px;font-weight:600;margin-bottom:2px}
+.aid .d{font-size:12px;color:var(--text2);line-height:1.5}
+.tb{background:var(--green-l);color:var(--green);border:none;border-radius:10px;padding:8px 12px;font-size:12px;cursor:pointer;width:100%;margin-top:6px;font-family:var(--font);display:flex;justify-content:space-between;align-items:center;font-weight:500}
+.mr{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;gap:8px}.mr:last-child{border:none}
+.db{background:var(--red-l);color:var(--red);font-size:9.5px;padding:2px 6px;border-radius:20px;white-space:nowrap;flex-shrink:0;font-weight:500}
+.bi{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;position:relative}
+.bdl{position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;color:var(--text3)}
+.btg{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;background:var(--green-l);color:var(--green);margin-bottom:5px;font-weight:500}
+#bf{padding:10px 12px;border-top:1px solid var(--border);flex-shrink:0;display:flex;flex-direction:column;gap:7px;background:var(--bg)}
+#bs,#bin{width:100%;border:1px solid var(--border2);border-radius:10px;padding:8px 10px;font-size:13px;background:var(--bg2);color:var(--text);font-family:var(--font);outline:none}
+#bin{resize:none;height:65px}
+#bs:focus,#bin:focus{border-color:var(--green)}
+#aa{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch}
+.ac{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.an{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px}
+.dr{font-size:11.5px;color:var(--text2);display:flex;align-items:center;gap:4px;margin-top:4px}
+.vb{background:var(--green-l);color:var(--green);font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:20px}
+.fb{background:#E6F1FB;color:#185FA5;font-size:10px;padding:2px 7px;border-radius:20px}
+.ptag{background:var(--yel-l);color:#856404;font-size:10px;padding:2px 7px;border-radius:20px}
+.aps{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
+.abr{display:flex;gap:6px;margin-top:9px}
+.ab{flex:1;border:1px solid var(--border);background:var(--bg2);color:var(--text2);border-radius:10px;padding:8px;font-size:10.5px;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:4px}
+.ab.p{background:var(--green);color:white;border-color:var(--green);font-weight:600}
+#af{padding:10px 12px;border-top:1px solid var(--border);flex-shrink:0;background:var(--bg)}
+.ab2{background:var(--green);color:white;border:none;border-radius:12px;padding:12px;font-size:13.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;width:100%;font-family:var(--font)}
+.ovl{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;z-index:50}
+.modal{background:var(--bg);border-radius:20px 20px 0 0;padding:18px 16px 32px;width:100%;max-height:92vh;overflow-y:auto}
+.modal h3{font-size:15px;font-weight:700;margin-bottom:12px;color:var(--text)}
+.fld{margin-bottom:8px}
+.fld label{display:block;font-size:11px;color:var(--text2);margin-bottom:3px;font-weight:500}
+.fld input,.fld select,.fld textarea{width:100%;border:1px solid var(--border2);border-radius:10px;padding:10px 12px;font-size:13px;background:var(--bg2);color:var(--text);font-family:var(--font);outline:none}
+.fld textarea{resize:none;height:55px}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--green)}
+.mbs{display:flex;gap:8px;margin-top:12px}
+.mbs button{flex:1;padding:12px;border-radius:12px;font-size:14px;cursor:pointer;font-family:var(--font);font-weight:600}
+.bc{background:var(--bg2);border:1px solid var(--border);color:var(--text2)}
+.bs2{background:var(--green);border:none;color:white}
+.pir{display:flex;gap:6px;margin-top:6px}
+.pir input{flex:1}
+.pir button{background:var(--green);color:white;border:none;border-radius:10px;padding:8px 12px;cursor:pointer;font-size:12px;font-family:var(--font);white-space:nowrap}
+.ple{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
+.pet{background:var(--green-l);color:var(--green);font-size:10.5px;padding:3px 8px;border-radius:20px;display:flex;align-items:center;gap:4px}
+.pet button{background:none;border:none;cursor:pointer;color:var(--green);font-size:11px;padding:0;line-height:1}
+.empty{text-align:center;padding:36px 20px;color:var(--text2)}
+.empty i{font-size:44px;color:#9FE1CB;display:block;margin-bottom:10px}
+.empty p{font-size:14px;font-weight:600;margin-bottom:5px}
+.empty span{font-size:12px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="hdr">
+    <div class="logo"><i class="ti ti-shield-check" style="color:white;font-size:17px"></i></div>
+    <div><h1>Limpeza Segura</h1><p>NR-6 · NR-9 · NR-15 · NR-26 · ABIPLA · ANVISA</p></div>
+  </div>
+  <div id="tabs">
+    <div class="tab active" id="t-chat" onclick="sw('chat')"><i class="ti ti-message-circle"></i>Chat</div>
+    <div class="tab red"    id="t-sos"  onclick="sw('sos')"><i class="ti ti-alert-triangle"></i>SOS</div>
+    <div class="tab"        id="t-base" onclick="sw('base')"><i class="ti ti-database"></i>Base</div>
+    <div class="tab"        id="t-ag"   onclick="sw('ag')"><i class="ti ti-calendar"></i>Agenda</div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="sec show" id="s-chat">
+    <div id="hb" style="display:none">
+      <i class="ti ti-home" style="font-size:15px;color:var(--green)"></i>
+      <span id="hbt"></span>
+      <button onclick="clearH()">Trocar</button>
+    </div>
+    <div id="pz"></div>
+    <div id="ca" class="scroll" aria-live="polite"></div>
+    <div id="chips">
+      <button class="chip" onclick="fhi()">🏠 Iniciar visita</button>
+      <button class="chip" onclick="sc('Quais misturas são proibidas?')">⚗️ Misturas</button>
+      <button class="chip" onclick="sc('Quais EPIs preciso usar?')">🧤 EPIs</button>
+      <button class="chip red" onclick="sw('sos')">🚨 Emergência</button>
+    </div>
+    <div id="ir">
+      <button id="cb" onclick="document.getElementById('ii').click()">
+        <i class="ti ti-camera" style="font-size:16px"></i>
+      </button>
+      <input type="file" id="ii" accept="image/*" capture="environment" onchange="hi(event)">
+      <textarea id="mi" placeholder="Ex: Hoje estou na casa da Dona Maria..." rows="1" onkeydown="hkd(event)" oninput="ar(this)"></textarea>
+      <button id="sb" onclick="sendMsg()">
+        <i class="ti ti-send" style="color:white;font-size:15px"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- SOS -->
+  <div class="sec" id="s-sos">
+    <div class="scroll">
+      <button class="sos-btn" onclick="tel('192')">
+        <i class="ti ti-phone-call" style="font-size:19px"></i>EMERGÊNCIA — SAMU 192
+      </button>
+      <div class="card">
+        <h3><i class="ti ti-first-aid-kit" style="font-size:15px;color:var(--red)"></i>Primeiros Socorros (ANVISA)</h3>
+        <div class="aid"><div class="s">😮‍💨 Inalou produto</div><div class="d">Leve para local aberto. Tontura ou falta de ar → SAMU 192.</div></div>
+        <div class="aid"><div class="s">👁️ Caiu nos olhos</div><div class="d">Lave com água corrente 15 min olhos abertos. Procure médico.</div></div>
+        <div class="aid"><div class="s">🖐️ Caiu na pele</div><div class="d">Tire a roupa. Lave com água 15 min. Se queimar → médico.</div></div>
+        <div class="aid"><div class="s">🚨 Ingeriu produto</div><div class="d">NÃO provoque vômito. Pronto-socorro com a embalagem.</div></div>
+      </div>
+      <div class="card">
+        <h3><i class="ti ti-phone" style="font-size:15px;color:var(--green)"></i>Contatos de emergência</h3>
+        <button class="tb" onclick="tel('192')">SAMU — Emergência médica <strong>192</strong></button>
+        <button class="tb" onclick="tel('193')">Bombeiros <strong>193</strong></button>
+        <button class="tb" onclick="tel('08007226001')">Central de Intoxicações <strong>0800-722-6001</strong></button>
+        <button class="tb" onclick="tel('08006429782')">ANVISA Atende <strong>0800-642-9782</strong></button>
+      </div>
+      <div class="card">
+        <h3><i class="ti ti-flask-off" style="font-size:15px;color:var(--red)"></i>Misturas PROIBIDAS</h3>
+        <div class="mr">Água sanitária + Desinfetante <span class="db">Cloramina ☠️</span></div>
+        <div class="mr">Água sanitária + Álcool <span class="db">Clorofórmio ☠️</span></div>
+        <div class="mr">Água sanitária + Vinagre <span class="db">Gás cloro ☠️</span></div>
+        <div class="mr">Água sanitária + Detergente <span class="db">Ácido sulfônico ☠️</span></div>
+        <div class="mr">Água sanitária + Pinho Sol <span class="db">Cloramina ☠️</span></div>
+        <div class="mr">Ácido muriático + Qualquer produto <span class="db">EXTREMO ☠️</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BASE -->
+  <div class="sec" id="s-base">
+    <div id="bl" class="scroll"></div>
+    <div id="bf">
+      <select id="bs">
+        <option value="Norma/NR">📋 Norma / NR</option>
+        <option value="Produto">🧴 Produto</option>
+        <option value="Mistura">⚗️ Mistura perigosa</option>
+        <option value="EPI">🧤 EPI</option>
+        <option value="Superfície">🏠 Superfície</option>
+        <option value="Outro">📌 Outro</option>
+      </select>
+      <textarea id="bin" placeholder="Ex: Ácido muriático exige luvas nitrílicas grossas, óculos vedados e máscara com filtro (NR-6)."></textarea>
+      <button class="ab2" onclick="addBase()">
+        <i class="ti ti-plus" style="font-size:14px"></i>Adicionar ao banco de dados
+      </button>
+    </div>
+  </div>
+
+  <!-- AGENDA -->
+  <div class="sec" id="s-ag">
+    <div id="aa"></div>
+    <div id="af">
+      <button class="ab2" onclick="oMod('new')">
+        <i class="ti ti-plus" style="font-size:14px"></i>Adicionar cliente
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div class="ovl" id="mc" style="display:none" onclick="if(event.target===this)cMod()">
+    <div class="modal">
+      <h3 id="mct">Novo cliente</h3>
+      <div class="fld"><label>Nome *</label><input id="fn" placeholder="Ex: Dona Maria"/></div>
+      <div class="fld"><label>Endereço</label><input id="fe" placeholder="Rua, número, bairro"/></div>
+      <div class="fld"><label>Dia(s) da semana</label><input id="fd" placeholder="Ex: Segunda e Quinta"/></div>
+      <div class="fld"><label>Horário de entrada</label><input id="fent" type="time"/></div>
+      <div class="fld"><label>Horário de saída</label><input id="fsa" type="time"/></div>
+      <div class="fld"><label>Valor cobrado (R$)</label><input id="fv" type="number" placeholder="150"/></div>
+      <div class="fld"><label>Frequência</label>
+        <select id="ff">
+          <option>Semanal</option><option>Quinzenal</option>
+          <option>Mensal</option><option>Diário</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label>Produtos nesta casa <span style="color:var(--green);font-size:10px">(ou tire foto no chat!)</span></label>
+        <div class="pir">
+          <input id="pi" placeholder="Ex: água sanitária" onkeydown="if(event.key==='Enter'){event.preventDefault();apl()}"/>
+          <button onclick="apl()">+ Add</button>
+        </div>
+        <div class="ple" id="ple"></div>
+      </div>
+      <div class="fld">
+        <label>Observações (piso, pets, crianças...)</label>
+        <textarea id="fo" placeholder="Ex: piso de mármore, tem gato..."></textarea>
+      </div>
+      <div class="mbs">
+        <button class="bc" onclick="cMod()">Cancelar</button>
+        <button class="bs2" onclick="saveC()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Inicializa Telegram Mini App
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+
+// STATE
+let msgs=[], agenda=[], baseItems=[], houseMemory={};
+let curHouseId=null, editId=null, tmpP=[], pendingProds=null;
+
+// STORAGE
+const sAg   = () => localStorage.setItem('ag',   JSON.stringify(agenda));
+const sBase = () => localStorage.setItem('base', JSON.stringify(baseItems));
+const sHM   = () => localStorage.setItem('hm',   JSON.stringify(houseMemory));
+const hk    = n  => n.toLowerCase().trim().replace(/\s+/g,'_');
+
+function loadAll() {
+  try { agenda      = JSON.parse(localStorage.getItem('ag')   || '[]'); } catch(e) { agenda=[]; }
+  try { baseItems   = JSON.parse(localStorage.getItem('base') || '[]'); } catch(e) { baseItems=[]; }
+  try { houseMemory = JSON.parse(localStorage.getItem('hm')   || '{}'); } catch(e) { houseMemory={}; }
+  renderAg(); renderBase();
+}
+
+// SYSTEM PROMPT
+function buildSys() {
+  const today = new Date().toLocaleDateString('pt-BR');
+  const hCtx = agenda.length
+    ? agenda.map(c => {
+        const m = houseMemory[hk(c.nome)] || {};
+        const p = m.products?.length ? m.products.join(', ') : 'nenhum ainda';
+        return `• "${c.nome}" (visita: ${m.lastVisit||'nunca'}): [${p}]${m.obs?' obs:'+m.obs:''}`;
+      }).join('\n')
+    : 'Sem clientes.';
+  const extra = baseItems.length
+    ? '\n📚 BASE PERSONALIZADA:\n' + baseItems.map(b=>`[${b.cat}] ${b.txt}`).join('\n')
+    : '';
+
+  return `Você é LIMPEZA SEGURA, assistente de segurança do trabalho para diaristas. Hoje: ${today}.
+Normas: NR-6, NR-9, NR-15, NR-26 (MTP 2.770/2022), ABIPLA 2023, ANVISA, NBR 14725-3:2009, FISPQs.
+
+🏠 CASAS DOS CLIENTES:
+${hCtx}
+
+══ NR-6 EPIs ══
+LUVAS: Borracha → limpeza geral/hipoclorito | Nitrílica → solventes/desengordurante/muriático | PVC → ácidos fortes.
+RESPIRAÇÃO: PFF2 → vapores cloro/amônia/solventes obrigatório em espaços fechados. Máscara com filtro → muriático.
+OLHOS: Óculos ampla visão → produtos corrosivos/spray. CORPO: Avental PVC → concentrados.
+Todos EPIs devem ter CA do MTE.
+
+══ NR-9 AGENTES QUÍMICOS ══
+Cloro: TLV-C 1ppm. Amônia: TLV-TWA 25ppm. Álcool: LEL 3,3% INFLAMÁVEL. HCl muriático: TLV-C 5ppm.
+Controles: 1º Substituir | 2º Ventilação | 3º EPIs.
+
+══ NR-15 INSALUBRIDADE ══
+Grau Máximo 40%: ácidos fortes, clorofórmio. Grau Médio 20%: cloro/amônia acima TLV. Grau Mínimo 10%: umidade.
+Ventilação adequada pode descaracterizar insalubridade.
+
+══ FISPQs ══
+ÁGUA SANITÁRIA: pH 11-13. NÃO misture: ácidos, álcool, amônia, desinfetante, detergente.
+ÁLCOOL 70%: Inflamável ponto fulgor 13°C. Nunca perto de chamas.
+ÁCIDO MURIÁTICO: pH<1. RISCO 2. EPI completo. JAMAIS com água sanitária → cloro gasoso letal.
+PINHO SOL: NUNCA com água sanitária → cloramina tóxica.
+DESENGORDURANTE: pH 10-13. Luvas nitrílicas obrigatórias.
+DETERGENTE NEUTRO: pH 6-8. Baixo risco.
+
+══ SUPERFÍCIES ══
+Mármore/Granito: NUNCA ácidos. Inox: cloro moderado. Madeira: pano úmido.
+Couro: NUNCA álcool/cloro. Vidro: álcool 70%. Porcelanato: água sanitária 1:10. Alumínio: NUNCA alcalino forte.
+
+══ PROTOCOLO VISITA ══
+Ao mencionar casa: 1) Buscar produtos 2) SE tem: confirmar lista 3) SE não tem: perguntar produtos
+4) Avisar misturas perigosas e EPIs 5) Perguntar superfícies e ventilação
+INCLUIR SEMPRE: %%CASA%%{"nome":"NOME","produtos":["p1","p2"],"obs":"obs"}%%
+
+══ DETECÇÃO POR FOTO ══
+Identificar TODOS produtos. SE casa ativa: salvar + %%CASA%%. SE sem casa: %%PRODS%%{"produtos":["p1"]}%%
+SEMPRE avisar misturas perigosas + EPIs.
+
+LINGUAGEM: Simples, clara, emojis, máx 7 linhas.
+Formato: ✅ Pode / ❌ Não / 🧤 EPI / ⚠️ Cuidado / 🏠 Superfície${extra}`;
+}
+
+// COMMAND PARSER
+function parseCmd(text) {
+  const cm = text.match(/%%CASA%%(\{[\s\S]*?\})%%/);
+  if (cm) {
+    try { const d=JSON.parse(cm[1]); saveToHouse(d.nome,d.produtos||[],d.obs||'',true); } catch(e){}
+    text = text.replace(/%%CASA%%[\s\S]*?%%/,'').trim();
+  }
+  const pm = text.match(/%%PRODS%%(\{[\s\S]*?\})%%/);
+  if (pm) {
+    try { const d=JSON.parse(pm[1]); pendingProds=d.produtos||[]; setTimeout(()=>showPZ(pendingProds),400); } catch(e){}
+    text = text.replace(/%%PRODS%%[\s\S]*?%%/,'').trim();
+  }
+  return text;
+}
+
+function saveToHouse(nome, prods, obs, toast) {
+  const key = hk(nome);
+  if (!houseMemory[key]) houseMemory[key]={};
+  const existing = houseMemory[key].products||[];
+  const merged = [...new Set([...existing,...prods.map(p=>p.toLowerCase().trim())])];
+  houseMemory[key].products    = merged;
+  if (obs) houseMemory[key].obs = obs;
+  houseMemory[key].displayName = nome;
+  houseMemory[key].lastVisit   = new Date().toLocaleDateString('pt-BR');
+  sHM();
+  updateBanner(nome);
+  const ag = agenda.find(a=>hk(a.nome)===key);
+  if (ag) { ag.produtos=merged; sAg(); }
+  renderAg();
+  if (toast) showToast(nome,prods);
+}
+
+function showToast(nome,prods) {
+  const z=document.getElementById('pz');
+  const d=document.createElement('div'); d.className='toast';
+  d.innerHTML=`<i class="ti ti-check" style="font-size:15px;margin-top:1px"></i><div><strong>Salvo — ${nome}</strong><br>${prods.slice(0,3).join(', ')}${prods.length>3?'...':''}</div>`;
+  z.innerHTML=''; z.appendChild(d);
+  setTimeout(()=>{d.style.opacity='0';d.style.transition='opacity .5s';setTimeout(()=>z.innerHTML='',600);},3500);
+}
+
+function showPZ(prods) {
+  if (!agenda.length) return;
+  const z=document.getElementById('pz');
+  const hs=agenda.map(a=>`<button class="phb" onclick="asgPending('${a.nome}')">${a.nome}</button>`).join('');
+  z.innerHTML=`<div class="pcard"><strong><i class="ti ti-package" style="font-size:14px"></i>Salvar ${prods.length} produto(s) em qual casa?</strong><div style="font-size:11px;margin-bottom:4px">${prods.join(' · ')}</div><div class="ph">${hs}<button class="phb skip" onclick="document.getElementById('pz').innerHTML=''">Agora não</button></div></div>`;
+}
+
+function asgPending(nome) {
+  if (!pendingProds) return;
+  saveToHouse(nome,pendingProds,'',true);
+  pendingProds=null;
+  document.getElementById('pz').innerHTML='';
+}
+
+function updateBanner(nome) {
+  curHouseId=hk(nome);
+  document.getElementById('hbt').textContent='🏠 '+nome;
+  document.getElementById('hb').style.display='flex';
+}
+function clearH() { curHouseId=null; document.getElementById('hb').style.display='none'; }
+function fhi() {
+  const m=document.getElementById('mi');
+  m.value='Hoje estou na casa de '; m.focus();
+  document.getElementById('chips').style.display='none';
+}
+function tel(n) { window.location.href='tel:'+n; }
+
+function addMsg(role,raw,isImg=false) {
+  let text=raw;
+  if (role==='ai'&&!isImg) text=parseCmd(raw);
+  const div=document.createElement('div');
+  if (isImg) {
+    div.className='msg photo user';
+    const img=document.createElement('img'); img.src=raw; img.alt='Foto'; div.appendChild(img);
+  } else {
+    div.className='msg '+(role==='user'?'user':'ai');
+    if (role==='ai') {
+      const l=document.createElement('span'); l.className='lbl';
+      l.textContent='🛡️ Limpeza Segura'; div.appendChild(l);
+    }
+    const p=document.createElement('p'); p.style.whiteSpace='pre-wrap';
+    p.textContent=text; div.appendChild(p);
+  }
+  document.getElementById('ca').appendChild(div);
+  div.scrollIntoView({behavior:'smooth'});
+}
+
+function showTyp() {
+  const d=document.createElement('div'); d.className='msg ai'; d.id='typ';
+  d.innerHTML='<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  document.getElementById('ca').appendChild(d); d.scrollIntoView({behavior:'smooth'});
+}
+function remTyp() { const t=document.getElementById('typ'); if(t)t.remove(); }
+
+async function callAPI(messages) {
+  showTyp(); document.getElementById('sb').disabled=true;
+  try {
+    const r=await fetch('/api/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages, system:buildSys(), max_tokens:900})
+    });
+    const d=await r.json();
+    const rep=d.content?.[0]?.text||'Desculpe, tente novamente.';
+    msgs.push({role:'assistant',content:rep});
+    remTyp(); addMsg('ai',rep);
+  } catch(e) {
+    remTyp(); addMsg('ai','Ops! Verifique sua conexão. 😊');
+  }
+  document.getElementById('sb').disabled=false;
+}
+
+async function sendMsg() {
+  const i=document.getElementById('mi'); const t=i.value.trim(); if(!t)return;
+  i.value=''; i.style.height='auto';
+  document.getElementById('chips').style.display='none';
+  addMsg('user',t); msgs.push({role:'user',content:t});
+  await callAPI(msgs);
+}
+async function sc(t) {
+  document.getElementById('chips').style.display='none';
+  addMsg('user',t); msgs.push({role:'user',content:t});
+  await callAPI(msgs);
+}
+
+async function hi(event) {
+  const f=event.target.files[0]; if(!f)return; event.target.value='';
+  const reader=new FileReader();
+  reader.onload=async(e)=>{
+    const durl=e.target.result; const b64=durl.split(',')[1]; const mt=f.type||'image/jpeg';
+    addMsg('user',durl,true);
+    document.getElementById('chips').style.display='none';
+    const hCtx=curHouseId&&houseMemory[curHouseId]?`Estou na casa de ${houseMemory[curHouseId].displayName}.`:'';
+    const uc=[
+      {type:'image',source:{type:'base64',media_type:mt,data:b64}},
+      {type:'text',text:`${hCtx} Analise esta foto, identifique todos os produtos de limpeza visíveis e salve automaticamente.`}
+    ];
+    msgs.push({role:'user',content:uc});
+    await callAPI(msgs);
+    msgs[msgs.length-2]={role:'user',content:`${hCtx} [Foto de produtos enviada]`};
+  };
+  reader.readAsDataURL(f);
+}
+
+function hkd(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function ar(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,75)+'px';}
+function sw(tab){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('show'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('s-'+tab).classList.add('show');
+  document.getElementById('t-'+tab).classList.add('active');
+}
+
+async function addBase(){
+  const txt=document.getElementById('bin').value.trim();
+  const cat=document.getElementById('bs').value;
+  if(!txt){alert('Digite uma informação!');return;}
+  baseItems.push({id:Date.now(),cat,txt}); sBase(); renderBase();
+  document.getElementById('bin').value='';
+}
+function delBase(id){baseItems=baseItems.filter(b=>b.id!==id);sBase();renderBase();}
+function renderBase(){
+  const l=document.getElementById('bl');
+  if(!baseItems.length){
+    l.innerHTML='<div class="empty"><i class="ti ti-database"></i><p>Base vazia</p><span>Adicione normas e o chat vai usar automaticamente!</span></div>';
+    return;
+  }
+  l.innerHTML='';
+  baseItems.forEach(b=>{
+    const d=document.createElement('div'); d.className='bi';
+    d.innerHTML=`<span class="btg">${b.cat}</span><button class="bdl" onclick="delBase(${b.id})"><i class="ti ti-trash" style="font-size:13px"></i></button><div style="font-size:12px;color:var(--text2);margin-top:3px;line-height:1.5">${b.txt}</div>`;
+    l.appendChild(d);
+  });
+}
+
+function apl(){
+  const i=document.getElementById('pi');
+  const v=i.value.trim().toLowerCase();
+  if(!v)return; if(!tmpP.includes(v))tmpP.push(v); i.value=''; rple();
+}
+function rple(){
+  const d=document.getElementById('ple'); d.innerHTML='';
+  tmpP.forEach((p,i)=>{
+    const s=document.createElement('span'); s.className='pet';
+    s.innerHTML=`${p}<button onclick="tmpP.splice(${i},1);rple()"><i class="ti ti-x" style="font-size:10px"></i></button>`;
+    d.appendChild(s);
+  });
+}
+
+function oMod(type,id=null){
+  if(type==='new'){
+    editId=null; tmpP=[];
+    document.getElementById('mct').textContent='Novo cliente';
+    ['fn','fe','fd','fent','fsa','fv','fo'].forEach(x=>{const el=document.getElementById(x);if(el)el.value='';});
+    document.getElementById('ff').value='Semanal';
+    rple(); document.getElementById('mc').style.display='flex';
+  } else if(type==='edit'&&id){
+    editId=id; const c=agenda.find(a=>a.id===id); if(!c)return;
+    const m=houseMemory[hk(c.nome)]||{};
+    tmpP=[...(m.products||c.produtos||[])];
+    document.getElementById('mct').textContent='Editar — '+c.nome;
+    document.getElementById('fn').value=c.nome;
+    document.getElementById('fe').value=c.end||'';
+    document.getElementById('fd').value=c.dia||'';
+    document.getElementById('fent').value=c.ent||'';
+    document.getElementById('fsa').value=c.sai||'';
+    document.getElementById('fv').value=c.val||'';
+    document.getElementById('ff').value=c.freq||'Semanal';
+    document.getElementById('fo').value=m.obs||c.obs||'';
+    rple(); document.getElementById('mc').style.display='flex';
+  }
+}
+function cMod(){document.getElementById('mc').style.display='none';}
+
+function saveC(){
+  const nome=document.getElementById('fn').value.trim();
+  if(!nome){alert('Digite o nome!');return;}
+  const obs=document.getElementById('fo').value.trim();
+  const c={
+    id:editId||Date.now(), nome,
+    end:document.getElementById('fe').value.trim(),
+    dia:document.getElementById('fd').value.trim(),
+    ent:document.getElementById('fent').value,
+    sai:document.getElementById('fsa').value,
+    val:document.getElementById('fv').value,
+    freq:document.getElementById('ff').value, obs
+  };
+  if(editId) agenda=agenda.map(a=>a.id===editId?c:a); else agenda.push(c);
+  const key=hk(nome);
+  if(!houseMemory[key]) houseMemory[key]={};
+  houseMemory[key].products=tmpP;
+  houseMemory[key].obs=obs;
+  houseMemory[key].displayName=nome;
+  sAg(); sHM(); renderAg(); cMod();
+}
+
+function delC(id){
+  if(!confirm('Remover este cliente?'))return;
+  agenda=agenda.filter(c=>c.id!==id); sAg(); renderAg();
+}
+
+function startV(nome){
+  sw('chat');
+  const m=document.getElementById('mi');
+  m.value='Hoje estou na casa de '+nome; m.focus();
+  document.getElementById('chips').style.display='none';
+}
+
+function renderAg(){
+  const a=document.getElementById('aa');
+  if(!agenda.length){
+    a.innerHTML='<div class="empty"><i class="ti ti-calendar-off"></i><p>Nenhum cliente</p><span>Cadastre clientes para o app lembrar os produtos de cada casa!</span></div>';
+    return;
+  }
+  a.innerHTML='';
+  agenda.forEach(c=>{
+    const m=houseMemory[hk(c.nome)]||{};
+    const prods=m.products||[];
+    const h=(c.ent&&c.sai)?`${c.ent}–${c.sai}`:c.ent||'';
+    const ph=prods.length
+      ?prods.map(p=>`<span class="ptag">🧴 ${p}</span>`).join('')
+      :'<span style="font-size:10.5px;color:var(--text3)">Tire uma foto no chat!</span>';
+    const card=document.createElement('div'); card.className='ac';
+    card.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="an"><i class="ti ti-home-2" style="font-size:16px;color:var(--green)"></i>${c.nome}</div>
+        <button style="background:none;border:none;cursor:pointer;color:var(--text3)" onclick="delC(${c.id})">
+          <i class="ti ti-trash" style="font-size:14px"></i>
+        </button>
+      </div>
+      <div>
+        ${c.end?`<div class="dr"><i class="ti ti-map-pin" style="font-size:12px"></i>${c.end}</div>`:''}
+        ${c.dia?`<div class="dr"><i class="ti ti-calendar-week" style="font-size:12px"></i>${c.dia}</div>`:''}
+        ${h?`<div class="dr"><i class="ti ti-clock" style="font-size:12px"></i>${h}</div>`:''}
+        ${m.lastVisit?`<div class="dr"><i class="ti ti-clock-check" style="font-size:12px"></i>Última visita: ${m.lastVisit}</div>`:''}
+        <div style="display:flex;gap:5px;margin-top:6px">
+          ${c.val?`<span class="vb">R$ ${c.val}</span>`:''}
+          ${c.freq?`<span class="fb">${c.freq}</span>`:''}
+        </div>
+        <div style="font-size:10.5px;font-weight:600;color:var(--text2);margin-top:8px">Produtos registrados:</div>
+        <div class="aps" style="margin-top:5px">${ph}</div>
+        ${m.obs?`<div style="font-size:10.5px;color:var(--text3);margin-top:5px">📝 ${m.obs}</div>`:''}
+      </div>
+      <div class="abr">
+        <button class="ab p" onclick="startV('${c.nome}')">
+          <i class="ti ti-play" style="font-size:13px"></i>Iniciar visita
+        </button>
+        <button class="ab" onclick="oMod('edit',${c.id})">
+          <i class="ti ti-pencil" style="font-size:13px"></i>Editar
+        </button>
+      </div>`;
+    a.appendChild(card);
+  });
+}
+
+// INIT
+addMsg('ai','Olá! 👋 Sou a Limpeza Segura, agora com mais recursos!\n\n📖 Guia — o chat responde sobre qualquer produto\n📷 Foto — tire foto dos produtos e identifico automaticamente\n🗄️ Base — adicione suas próprias normas\n\nMe diga quais produtos vai usar hoje! 🧤✨');
+loadAll();
+</script>
+</body>
+</html>
