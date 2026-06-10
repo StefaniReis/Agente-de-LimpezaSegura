@@ -1,10 +1,3 @@
 {
-  "name": "limpeza-segura",
-  "version": "1.0.0",
-  "description": "App de segurança para diaristas com Telegram Mini App",
-  "engines": { "node": "24.x" },
-  "scripts": {
-    "dev": "vercel dev",
-    "deploy": "vercel --prod"
-  }
+  "type": "module",
 }
