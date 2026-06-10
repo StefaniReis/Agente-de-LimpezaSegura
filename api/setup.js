@@ -1,7 +1,4 @@
-// Roda UMA VEZ após o deploy
-// Acesse: https://seusite.vercel.app/api/setup
-
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   const BOT_TOKEN   = process.env.TELEGRAM_BOT_TOKEN;
   const WEBHOOK_URL = `${process.env.APP_URL}/api/webhook`;
 
@@ -32,4 +29,4 @@ export default async function handler(req, res) {
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
-}
+};
