@@ -9,18 +9,11 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 <style>
-:root {
-  --green:#085041;--green-l:#E1F5EE;--red:#A32D2D;--red-l:#FCEBEB;
-  --yel-l:#FFF8E1;--bg:#ffffff;--bg2:#f5f5f5;--text:#1a1a1a;
-  --text2:#666;--text3:#999;--border:#e0e0e0;--border2:#ccc;
-  --r:12px;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-}
-@media(prefers-color-scheme:dark){
-  :root{--bg:#121212;--bg2:#1e1e1e;--text:#f0f0f0;--text2:#aaa;--text3:#666;--border:#333;--border2:#444;}
-}
+:root{--green:#085041;--green-l:#E1F5EE;--red:#A32D2D;--red-l:#FCEBEB;--yel-l:#FFF8E1;--bg:#fff;--bg2:#f5f5f5;--text:#1a1a1a;--text2:#666;--text3:#999;--border:#e0e0e0;--border2:#ccc;--r:12px;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+@media(prefers-color-scheme:dark){:root{--bg:#121212;--bg2:#1e1e1e;--text:#f0f0f0;--text2:#aaa;--text3:#666;--border:#333;--border2:#444}}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font);background:var(--bg);height:100vh;overflow:hidden}
-#app{display:flex;flex-direction:column;height:100vh;max-width:500px;margin:0 auto;background:var(--bg);position:relative}
+#app{display:flex;flex-direction:column;height:100vh;max-width:500px;margin:0 auto;background:var(--bg)}
 #hdr{background:var(--green);padding:12px 14px 10px;display:flex;align-items:center;gap:10px;flex-shrink:0}
 #hdr .logo{width:34px;height:34px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 #hdr h1{font-size:14px;font-weight:600;color:white}
@@ -139,19 +132,16 @@ input[type=file]{display:none}
     <div id="ca" class="scroll" aria-live="polite"></div>
     <div id="chips">
       <button class="chip" onclick="fhi()">🏠 Iniciar visita</button>
-      <button class="chip" onclick="sc('Quais misturas são proibidas?')">⚗️ Misturas</button>
+      <button class="chip" onclick="sc('Pode misturar água sanitária com vinagre?')">⚗️ Misturas</button>
+      <button class="chip" onclick="sc('Posso usar água sanitária no mármore?')">🏠 Superfícies</button>
       <button class="chip" onclick="sc('Quais EPIs preciso usar?')">🧤 EPIs</button>
-      <button class="chip red" onclick="sw('sos')">🚨 Emergência</button>
+      <button class="chip red" onclick="sw('sos')">🚨 SOS</button>
     </div>
     <div id="ir">
-      <button id="cb" onclick="document.getElementById('ii').click()">
-        <i class="ti ti-camera" style="font-size:16px"></i>
-      </button>
+      <button id="cb" onclick="document.getElementById('ii').click()"><i class="ti ti-camera" style="font-size:16px"></i></button>
       <input type="file" id="ii" accept="image/*" capture="environment" onchange="hi(event)">
-      <textarea id="mi" placeholder="Ex: Hoje estou na casa da Dona Maria..." rows="1" onkeydown="hkd(event)" oninput="ar(this)"></textarea>
-      <button id="sb" onclick="sendMsg()">
-        <i class="ti ti-send" style="color:white;font-size:15px"></i>
-      </button>
+      <textarea id="mi" placeholder="Ex: Posso usar Pinho Sol no piso de madeira?" rows="1" onkeydown="hkd(event)" oninput="ar(this)"></textarea>
+      <button id="sb" onclick="sendMsg()"><i class="ti ti-send" style="color:white;font-size:15px"></i></button>
     </div>
   </div>
 
@@ -159,7 +149,7 @@ input[type=file]{display:none}
     <div class="scroll">
       <button class="sos-btn" onclick="tel('192')"><i class="ti ti-phone-call" style="font-size:19px"></i>EMERGÊNCIA — SAMU 192</button>
       <div class="card">
-        <h3><i class="ti ti-first-aid-kit" style="font-size:15px;color:var(--red)"></i>Primeiros Socorros (ANVISA)</h3>
+        <h3><i class="ti ti-first-aid-kit" style="font-size:15px;color:var(--red)"></i>Primeiros Socorros</h3>
         <div class="aid"><div class="s">😮‍💨 Inalou produto</div><div class="d">Leve para local aberto. Tontura ou falta de ar → SAMU 192.</div></div>
         <div class="aid"><div class="s">👁️ Caiu nos olhos</div><div class="d">Lave com água corrente 15 min olhos abertos. Procure médico.</div></div>
         <div class="aid"><div class="s">🖐️ Caiu na pele</div><div class="d">Tire a roupa. Lave com água 15 min. Se queimar → médico.</div></div>
@@ -218,21 +208,15 @@ input[type=file]{display:none}
         <select id="ff"><option>Semanal</option><option>Quinzenal</option><option>Mensal</option><option>Diário</option></select>
       </div>
       <div class="fld">
-        <label>Produtos nesta casa <span style="color:var(--green);font-size:10px">(ou tire foto no chat!)</span></label>
+        <label>Produtos nesta casa</label>
         <div class="pir">
           <input id="pi" placeholder="Ex: água sanitária" onkeydown="if(event.key==='Enter'){event.preventDefault();apl()}"/>
           <button onclick="apl()">+ Add</button>
         </div>
         <div class="ple" id="ple"></div>
       </div>
-      <div class="fld">
-        <label>Observações (piso, pets, crianças...)</label>
-        <textarea id="fo" placeholder="Ex: piso de mármore, tem gato..."></textarea>
-      </div>
-      <div class="mbs">
-        <button class="bc" onclick="cMod()">Cancelar</button>
-        <button class="bs2" onclick="saveC()">Salvar</button>
-      </div>
+      <div class="fld"><label>Observações (piso, pets, crianças...)</label><textarea id="fo" placeholder="Ex: piso de mármore, tem gato..."></textarea></div>
+      <div class="mbs"><button class="bc" onclick="cMod()">Cancelar</button><button class="bs2" onclick="saveC()">Salvar</button></div>
     </div>
   </div>
 </div>
@@ -251,21 +235,19 @@ const hk=n=>n.toLowerCase().trim().replace(/\s+/g,'_');
 
 function sMsgs(){
   try{
-    const toSave=msgs.filter(m=>typeof m.content==='string').slice(-50);
-    localStorage.setItem('chat_msgs',JSON.stringify(toSave));
-    localStorage.setItem('chat_houseId',curHouseId||'');
+    const s=msgs.filter(m=>typeof m.content==='string').slice(-50);
+    localStorage.setItem('chat_msgs',JSON.stringify(s));
+    localStorage.setItem('chat_hid',curHouseId||'');
   }catch(e){}
 }
 
 function limparChat(){
   if(!confirm('Apagar o histórico do chat?'))return;
-  msgs=[];
-  localStorage.removeItem('chat_msgs');
-  localStorage.removeItem('chat_houseId');
+  msgs=[];localStorage.removeItem('chat_msgs');localStorage.removeItem('chat_hid');
   document.getElementById('ca').innerHTML='';
   document.getElementById('chips').style.display='flex';
   clearH();
-  addMsg('ai','Olá! 👋 Sou a Limpeza Segura!\n\n📖 Guia — o chat responde sobre qualquer produto\n📷 Foto — tire foto dos produtos e identifico automaticamente\n🗄️ Base — adicione suas próprias normas\n\nMe diga quais produtos vai usar hoje! 🧤✨');
+  addMsg('ai','Olá! 👋 Pode me perguntar sobre qualquer produto!\n\n⚗️ Misturas perigosas — explico o motivo\n🏠 Superfícies — digo onde pode e não pode\n🧤 EPIs necessários\n📷 Identificação por foto\n\nComo posso ajudar? 😊');
 }
 
 function loadAll(){
@@ -273,12 +255,12 @@ function loadAll(){
   try{baseItems=JSON.parse(localStorage.getItem('base')||'[]');}catch(e){baseItems=[];}
   try{houseMemory=JSON.parse(localStorage.getItem('hm')||'{}');}catch(e){houseMemory={};}
   try{
-    const savedMsgs=JSON.parse(localStorage.getItem('chat_msgs')||'[]');
-    const savedHouse=localStorage.getItem('chat_houseId')||'';
-    if(savedMsgs.length>0){
-      msgs=savedMsgs;
-      savedMsgs.forEach(m=>renderMsgOnly(m.role,m.content));
-      if(savedHouse&&houseMemory[savedHouse])updateBanner(houseMemory[savedHouse].displayName);
+    const s=JSON.parse(localStorage.getItem('chat_msgs')||'[]');
+    const h=localStorage.getItem('chat_hid')||'';
+    if(s.length>0){
+      msgs=s;
+      s.forEach(m=>renderMsgOnly(m.role,m.content));
+      if(h&&houseMemory[h])updateBanner(houseMemory[h].displayName);
       document.getElementById('chips').style.display='none';
     }
   }catch(e){msgs=[];}
@@ -296,47 +278,90 @@ function renderMsgOnly(role,text){
 function buildSys(){
   const today=new Date().toLocaleDateString('pt-BR');
   const hCtx=agenda.length
-    ?agenda.map(c=>{const m=houseMemory[hk(c.nome)]||{};const p=m.products?.length?m.products.join(', '):'nenhum ainda';return`• "${c.nome}" (visita: ${m.lastVisit||'nunca'}): [${p}]${m.obs?' obs:'+m.obs:''}`;}).join('\n')
+    ?agenda.map(c=>{const m=houseMemory[hk(c.nome)]||{};const p=m.products?.length?m.products.join(', '):'nenhum ainda';return`• "${c.nome}" (visita:${m.lastVisit||'nunca'}): [${p}]${m.obs?' obs:'+m.obs:''}`;}).join('\n')
     :'Sem clientes.';
   const extra=baseItems.length?'\n📚 BASE PERSONALIZADA:\n'+baseItems.map(b=>`[${b.cat}] ${b.txt}`).join('\n'):'';
-  return`Você é LIMPEZA SEGURA, assistente de segurança do trabalho para diaristas. Hoje: ${today}.
-Normas: NR-6, NR-9, NR-15, NR-26 (MTP 2.770/2022), ABIPLA 2023, ANVISA, NBR 14725-3:2009, FISPQs.
 
-🏠 CASAS DOS CLIENTES:
+  return`Você é LIMPEZA SEGURA, assistente de segurança para diaristas. Hoje: ${today}.
+Base: NR-6, NR-9, NR-15, NR-26, ABIPLA 2023, ANVISA, FISPQs.
+
+🏠 CASAS:
 ${hCtx}
 
-══ NR-6 EPIs ══
-LUVAS: Borracha → limpeza geral/hipoclorito | Nitrílica → solventes/desengordurante/muriático | PVC → ácidos fortes.
-RESPIRAÇÃO: PFF2 → vapores cloro/amônia/solventes obrigatório em espaços fechados.
-OLHOS: Óculos ampla visão → produtos corrosivos/spray. CORPO: Avental PVC → concentrados.
+══ REGRA MAIS IMPORTANTE ══
+SEMPRE explique o MOTIVO completo. NUNCA diga só sim ou não sem explicar.
+- ✅ PODE — explique POR QUE é seguro nessa superfície
+- ❌ NÃO PODE — explique QUAL reação química ocorre, QUAL gás forma, QUAIS sintomas causa
+- 🏠 SUPERFÍCIE — explique POR QUE danifica ou não danifica a superfície
 
-══ NR-9 AGENTES QUÍMICOS ══
-Cloro: TLV-C 1ppm. Amônia: TLV-TWA 25ppm. Álcool: LEL 3,3% INFLAMÁVEL. HCl muriático: TLV-C 5ppm.
+══ MISTURAS PROIBIDAS — EXPLIQUE SEMPRE O MOTIVO ══
+❌ Água sanitária + Vinagre ou Limão:
+Motivo: hipoclorito de sódio + ácido acético = gás cloro (Cl₂). Causa queimação nos olhos e garganta, tosse severa, falta de ar e pode ser fatal em ambientes fechados.
 
-══ NR-15 INSALUBRIDADE ══
-Grau Máximo 40%: ácidos fortes. Grau Médio 20%: cloro/amônia acima TLV. Grau Mínimo 10%: umidade.
+❌ Água sanitária + Álcool:
+Motivo: forma clorofórmio (CHCl₃) e organoclorados. Causa tontura, náusea e com exposição repetida causa dano ao fígado e rins.
 
-══ FISPQs ══
-ÁGUA SANITÁRIA: pH 11-13. NÃO misture: ácidos, álcool, amônia, desinfetante, detergente.
-ÁLCOOL 70%: Inflamável ponto fulgor 13°C. Nunca perto de chamas.
-ÁCIDO MURIÁTICO: pH<1. EPI completo. JAMAIS com água sanitária.
-PINHO SOL: NUNCA com água sanitária → cloramina tóxica.
-DESENGORDURANTE: Luvas nitrílicas obrigatórias.
+❌ Água sanitária + Desinfetante ou Pinho Sol (contém amônia):
+Motivo: hipoclorito + amônia = cloraminas (NH₂Cl). Causa irritação severa das vias respiratórias, dor no peito e pode causar pneumonia química.
 
-══ SUPERFÍCIES ══
-Mármore/Granito: NUNCA ácidos. Inox: cloro moderado. Madeira: pano úmido.
-Couro: NUNCA álcool/cloro. Vidro: álcool 70%. Porcelanato: água sanitária 1:10.
+❌ Água sanitária + Detergente:
+Motivo: ácido sulfônico do detergente neutraliza o cloro, perde eficiência e forma compostos que irritam pele e mucosas.
+
+❌ Ácido muriático + qualquer outro produto:
+Motivo: ácido clorídrico reage com quase tudo formando gases tóxicos variados. Causa queimaduras químicas graves em segundos e dano permanente aos pulmões. USE SEMPRE SOZINHO, muito diluído e com janelas abertas.
+
+══ SUPERFÍCIES — SEMPRE EXPLIQUE O MOTIVO ══
+ÁGUA SANITÁRIA (hipoclorito de sódio):
+✅ PODE: cerâmica, porcelanato, vidro, inox diluída 1:10, box do banheiro
+❌ NÃO PODE no mármore/granito: o hipoclorito reage com o carbonato de cálcio da pedra, corroendo a superfície de forma irreversível, manchando permanentemente.
+❌ NÃO PODE na madeira: penetra nas fibras, descora e apodrece a madeira com o tempo.
+❌ NÃO PODE no couro: resseca, racha e descolore o couro.
+❌ NÃO PODE no alumínio: reação química escurece o alumínio permanentemente.
+
+ÁLCOOL 70%:
+✅ PODE: inox, vidro, plástico rígido, cerâmica, metais cromados
+❌ NÃO PODE na madeira sem verniz: resseca as fibras da madeira.
+❌ NÃO PODE no couro: retira a oleosidade natural, ressecando e rachando.
+❌ NÃO PODE em telas de TV/celular: remove o revestimento oleofóbico da tela.
+⚠️ ATENÇÃO: é inflamável! Nunca use perto de fogão ligado ou chamas.
+
+VINAGRE:
+✅ PODE: vidro, plástico, inox (diluído)
+❌ NÃO PODE no mármore/granito/calcário: o ácido acético reage com o carbonato de cálcio, corrói a pedra de forma irreversível — mesmo diluído.
+
+PINHO SOL / DESINFETANTE:
+✅ PODE: cerâmica, porcelanato, plástico, inox
+❌ NÃO PODE na madeira sem acabamento: pode manchar e ressecar.
+
+ÁCIDO MURIÁTICO:
+✅ PODE: cerâmica muito manchada e rejunte (diluído 1:20, máximo 5 minutos, enxaguar imediatamente)
+❌ NÃO PODE no mármore/granito: destrói a superfície completamente.
+❌ NÃO PODE no inox: corrói e perfura o metal.
+❌ NUNCA use em espaço fechado: gera névoa ácida que destrói os pulmões.
+
+DESENGORDURANTE:
+✅ PODE: inox, cerâmica, vidro, fogão esmaltado
+❌ NÃO PODE no alumínio anodizado: reação alcalina escurece permanentemente.
+
+══ EPIs (NR-6) ══
+Água sanitária: luvas de borracha + óculos se houver respingo
+Álcool: luvas nitrílicas, longe de chamas (inflamável!)
+Ácido muriático: luvas nitrílicas grossas + óculos vedados + máscara com filtro P2 + avental PVC
+Desengordurante concentrado: luvas nitrílicas
+Sprays em geral: óculos de proteção
 
 ══ PROTOCOLO VISITA ══
-Ao mencionar casa: confirmar produtos, avisar misturas perigosas, perguntar superfícies e ventilação.
-INCLUIR SEMPRE: %%CASA%%{"nome":"NOME","produtos":["p1","p2"],"obs":"obs"}%%
+Ao mencionar casa: confirmar produtos, avisar misturas e superfícies incompatíveis.
+SEMPRE incluir: %%CASA%%{"nome":"NOME","produtos":["p1","p2"],"obs":"obs"}%%
 
 ══ DETECÇÃO POR FOTO ══
-Identificar TODOS produtos. SE casa ativa: %%CASA%%. SE sem casa: %%PRODS%%{"produtos":["p1"]}%%
+Identificar produtos → salvar na casa → avisar riscos específicos de cada produto.
+SE sem casa ativa: %%PRODS%%{"produtos":["p1"]}%%
 
-LINGUAGEM: Simples, clara, emojis. Máx 10 linhas.
-SEMPRE explique o MOTIVO — ex: "❌ Não misture porque gera gás tóxico que causa..."
-Formato: ✅ Pode / ❌ Não pode / 🧤 EPI necessário / ⚠️ Cuidado / 🏠 Superfície
+LINGUAGEM: Clara, simples, emojis. Máximo 12 linhas.
+OBRIGATÓRIO: sempre explique o motivo químico de forma simples, como se falasse com alguém sem conhecimento técnico.${extra}`;
+}
+
 function parseCmd(text){
   const cm=text.match(/%%CASA%%(\{[\s\S]*?\})%%/);
   if(cm){try{const d=JSON.parse(cm[1]);saveToHouse(d.nome,d.produtos||[],d.obs||'',true);}catch(e){}text=text.replace(/%%CASA%%[\s\S]*?%%/,'').trim();}
@@ -348,8 +373,8 @@ function parseCmd(text){
 function saveToHouse(nome,prods,obs,toast){
   const key=hk(nome);
   if(!houseMemory[key])houseMemory[key]={};
-  const existing=houseMemory[key].products||[];
-  const merged=[...new Set([...existing,...prods.map(p=>p.toLowerCase().trim())])];
+  const ex=houseMemory[key].products||[];
+  const merged=[...new Set([...ex,...prods.map(p=>p.toLowerCase().trim())])];
   houseMemory[key].products=merged;
   if(obs)houseMemory[key].obs=obs;
   houseMemory[key].displayName=nome;
@@ -392,10 +417,8 @@ function addMsg(role,raw,isImg=false){
   let text=raw;
   if(role==='ai'&&!isImg)text=parseCmd(raw);
   const div=document.createElement('div');
-  if(isImg){
-    div.className='msg photo user';
-    const img=document.createElement('img');img.src=raw;img.alt='Foto';div.appendChild(img);
-  }else{
+  if(isImg){div.className='msg photo user';const img=document.createElement('img');img.src=raw;img.alt='Foto';div.appendChild(img);}
+  else{
     div.className='msg '+(role==='user'?'user':'ai');
     if(role==='ai'){const l=document.createElement('span');l.className='lbl';l.textContent='🛡️ Limpeza Segura';div.appendChild(l);}
     const p=document.createElement('p');p.style.whiteSpace='pre-wrap';p.textContent=text;div.appendChild(p);
@@ -414,8 +437,7 @@ async function callAPI(messages){
     const d=await r.json();
     const rep=d.content?.[0]?.text||'Desculpe, tente novamente.';
     msgs.push({role:'assistant',content:rep});
-    remTyp();addMsg('ai',rep);
-    sMsgs();
+    remTyp();addMsg('ai',rep);sMsgs();
   }catch(e){remTyp();addMsg('ai','Ops! Verifique sua conexão. 😊');}
   document.getElementById('sb').disabled=false;
 }
@@ -425,15 +447,13 @@ async function sendMsg(){
   i.value='';i.style.height='auto';
   document.getElementById('chips').style.display='none';
   addMsg('user',t);msgs.push({role:'user',content:t});
-  sMsgs();
-  await callAPI(msgs);
+  sMsgs();await callAPI(msgs);
 }
 
 async function sc(t){
   document.getElementById('chips').style.display='none';
   addMsg('user',t);msgs.push({role:'user',content:t});
-  sMsgs();
-  await callAPI(msgs);
+  sMsgs();await callAPI(msgs);
 }
 
 async function hi(event){
@@ -444,11 +464,10 @@ async function hi(event){
     addMsg('user',durl,true);
     document.getElementById('chips').style.display='none';
     const hCtx=curHouseId&&houseMemory[curHouseId]?`Estou na casa de ${houseMemory[curHouseId].displayName}.`:'';
-    const uc=[{type:'image',source:{type:'base64',media_type:mt,data:b64}},{type:'text',text:`${hCtx} Analise esta foto, identifique todos os produtos de limpeza visíveis e salve automaticamente.`}];
+    const uc=[{type:'image',source:{type:'base64',media_type:mt,data:b64}},{type:'text',text:`${hCtx} Analise esta foto, identifique todos os produtos e avise sobre misturas perigosas e superfícies incompatíveis.`}];
     msgs.push({role:'user',content:uc});
     await callAPI(msgs);
-    msgs[msgs.length-2]={role:'user',content:`${hCtx} [Foto de produtos enviada]`};
-    sMsgs();
+    msgs[msgs.length-2]={role:'user',content:`${hCtx} [Foto enviada]`};sMsgs();
   };
   reader.readAsDataURL(f);
 }
@@ -459,14 +478,14 @@ function sw(tab){document.querySelectorAll('.sec').forEach(s=>s.classList.remove
 
 async function addBase(){
   const txt=document.getElementById('bin').value.trim();const cat=document.getElementById('bs').value;
-  if(!txt){alert('Digite uma informação!');return;}
+  if(!txt){alert('Digite!');return;}
   baseItems.push({id:Date.now(),cat,txt});sBase();renderBase();
   document.getElementById('bin').value='';
 }
 function delBase(id){baseItems=baseItems.filter(b=>b.id!==id);sBase();renderBase();}
 function renderBase(){
   const l=document.getElementById('bl');
-  if(!baseItems.length){l.innerHTML='<div class="empty"><i class="ti ti-database"></i><p>Base vazia</p><span>Adicione normas e o chat vai usar automaticamente!</span></div>';return;}
+  if(!baseItems.length){l.innerHTML='<div class="empty"><i class="ti ti-database"></i><p>Base vazia</p><span>Adicione normas e o chat vai usar!</span></div>';return;}
   l.innerHTML='';
   baseItems.forEach(b=>{const d=document.createElement('div');d.className='bi';d.innerHTML=`<span class="btg">${b.cat}</span><button class="bdl" onclick="delBase(${b.id})"><i class="ti ti-trash" style="font-size:13px"></i></button><div style="font-size:12px;color:var(--text2);margin-top:3px;line-height:1.5">${b.txt}</div>`;l.appendChild(d);});
 }
@@ -490,27 +509,26 @@ function saveC(){
   sAg();sHM();renderAg();cMod();
 }
 
-function delC(id){if(!confirm('Remover este cliente?'))return;agenda=agenda.filter(c=>c.id!==id);sAg();renderAg();}
-
+function delC(id){if(!confirm('Remover?'))return;agenda=agenda.filter(c=>c.id!==id);sAg();renderAg();}
 function startV(nome){sw('chat');const m=document.getElementById('mi');m.value='Hoje estou na casa de '+nome;m.focus();document.getElementById('chips').style.display='none';}
 
 function renderAg(){
   const a=document.getElementById('aa');
-  if(!agenda.length){a.innerHTML='<div class="empty"><i class="ti ti-calendar-off"></i><p>Nenhum cliente</p><span>Cadastre clientes para o app lembrar os produtos de cada casa!</span></div>';return;}
+  if(!agenda.length){a.innerHTML='<div class="empty"><i class="ti ti-calendar-off"></i><p>Nenhum cliente</p><span>Cadastre clientes para lembrar os produtos de cada casa!</span></div>';return;}
   a.innerHTML='';
   agenda.forEach(c=>{
     const m=houseMemory[hk(c.nome)]||{};const prods=m.products||[];
     const h=(c.ent&&c.sai)?`${c.ent}–${c.sai}`:c.ent||'';
-    const ph=prods.length?prods.map(p=>`<span class="ptag">🧴 ${p}</span>`).join(''):'<span style="font-size:10.5px;color:var(--text3)">Tire uma foto no chat!</span>';
+    const ph=prods.length?prods.map(p=>`<span class="ptag">🧴 ${p}</span>`).join(''):'<span style="font-size:10.5px;color:var(--text3)">Tire uma foto!</span>';
     const card=document.createElement('div');card.className='ac';
-    card.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start"><div class="an"><i class="ti ti-home-2" style="font-size:16px;color:var(--green)"></i>${c.nome}</div><button style="background:none;border:none;cursor:pointer;color:var(--text3)" onclick="delC(${c.id})"><i class="ti ti-trash" style="font-size:14px"></i></button></div><div>${c.end?`<div class="dr"><i class="ti ti-map-pin" style="font-size:12px"></i>${c.end}</div>`:''} ${c.dia?`<div class="dr"><i class="ti ti-calendar-week" style="font-size:12px"></i>${c.dia}</div>`:''} ${h?`<div class="dr"><i class="ti ti-clock" style="font-size:12px"></i>${h}</div>`:''} ${m.lastVisit?`<div class="dr"><i class="ti ti-clock-check" style="font-size:12px"></i>Última visita: ${m.lastVisit}</div>`:''}<div style="display:flex;gap:5px;margin-top:6px">${c.val?`<span class="vb">R$ ${c.val}</span>`:''} ${c.freq?`<span class="fb">${c.freq}</span>`:''}</div><div style="font-size:10.5px;font-weight:600;color:var(--text2);margin-top:8px">Produtos:</div><div class="aps" style="margin-top:5px">${ph}</div>${m.obs?`<div style="font-size:10.5px;color:var(--text3);margin-top:5px">📝 ${m.obs}</div>`:''}</div><div class="abr"><button class="ab p" onclick="startV('${c.nome}')"><i class="ti ti-play" style="font-size:13px"></i>Iniciar visita</button><button class="ab" onclick="oMod('edit',${c.id})"><i class="ti ti-pencil" style="font-size:13px"></i>Editar</button></div>`;
+    card.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start"><div class="an"><i class="ti ti-home-2" style="font-size:16px;color:var(--green)"></i>${c.nome}</div><button style="background:none;border:none;cursor:pointer;color:var(--text3)" onclick="delC(${c.id})"><i class="ti ti-trash" style="font-size:14px"></i></button></div><div>${c.end?`<div class="dr"><i class="ti ti-map-pin" style="font-size:12px"></i>${c.end}</div>`:''} ${c.dia?`<div class="dr"><i class="ti ti-calendar-week" style="font-size:12px"></i>${c.dia}</div>`:''} ${h?`<div class="dr"><i class="ti ti-clock" style="font-size:12px"></i>${h}</div>`:''} ${m.lastVisit?`<div class="dr"><i class="ti ti-clock-check" style="font-size:12px"></i>Última: ${m.lastVisit}</div>`:''}<div style="display:flex;gap:5px;margin-top:6px">${c.val?`<span class="vb">R$ ${c.val}</span>`:''} ${c.freq?`<span class="fb">${c.freq}</span>`:''}</div><div style="font-size:10.5px;font-weight:600;color:var(--text2);margin-top:8px">Produtos:</div><div class="aps" style="margin-top:5px">${ph}</div>${m.obs?`<div style="font-size:10.5px;color:var(--text3);margin-top:5px">📝 ${m.obs}</div>`:''}</div><div class="abr"><button class="ab p" onclick="startV('${c.nome}')"><i class="ti ti-play" style="font-size:13px"></i>Iniciar visita</button><button class="ab" onclick="oMod('edit',${c.id})"><i class="ti ti-pencil" style="font-size:13px"></i>Editar</button></div>`;
     a.appendChild(card);
   });
 }
 
 loadAll();
 if(msgs.length===0){
-  addMsg('ai','Olá! 👋 Sou a Limpeza Segura!\n\n📖 Guia — o chat responde sobre qualquer produto\n📷 Foto — tire foto dos produtos e identifico automaticamente\n🗄️ Base — adicione suas próprias normas\n\nMe diga quais produtos vai usar hoje! 🧤✨');
+  addMsg('ai','Olá! 👋 Sou a Limpeza Segura!\n\nPosso te ajudar com:\n⚗️ Misturas perigosas — explico o motivo\n🏠 Superfícies — digo onde pode e não pode usar\n🧤 EPIs necessários\n📷 Identificação por foto\n\nMe pergunte qualquer coisa! 😊');
 }
 </script>
 </body>
