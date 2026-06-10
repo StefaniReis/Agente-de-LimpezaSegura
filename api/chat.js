@@ -1,5 +1,4 @@
 // Backend que chama o Gemini (Google) grátis
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -16,7 +15,6 @@ export default async function handler(req, res) {
     // Converte formato do app → formato Gemini
     const geminiContents = messages.map(msg => {
       const role = msg.role === 'assistant' ? 'model' : 'user';
-
       if (Array.isArray(msg.content)) {
         const parts = msg.content.map(c => {
           if (c.type === 'text') return { text: c.text };
@@ -27,26 +25,58 @@ export default async function handler(req, res) {
         }).filter(Boolean);
         return { role, parts };
       }
-
       return { role, parts: [{ text: String(msg.content) }] };
     });
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: system ? { parts: [{ text: system }] } : undefined,
-          contents: geminiContents,
-          generationConfig: { maxOutputTokens: max_tokens || 900, temperature: 0.7 }
-        })
-      }
-    );
+    // ✅ MODELOS ATUALIZADOS — tenta gemini-2.0-flash primeiro, depois outros
+    const modelos = [
+      'gemini-2.0-flash',
+      'gemini-2.0-flash-lite',
+      'gemini-1.5-flash-latest',
+      'gemini-1.5-flash-8b'
+    ];
 
-    if (!response.ok) {
-      const err = await response.json();
-      return res.status(500).json({ error: 'Erro na API Gemini', details: err });
+    let response = null;
+    let lastError = null;
+
+    for (const modelo of modelos) {
+      try {
+        response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              system_instruction: system ? { parts: [{ text: system }] } : undefined,
+              contents: geminiContents,
+              generationConfig: { maxOutputTokens: max_tokens || 900, temperature: 0.7 }
+            })
+          }
+        );
+
+        if (response.ok) {
+          console.log(`✅ Modelo funcionando: ${modelo}`);
+          break; // Achou um modelo que funciona!
+        }
+
+        lastError = await response.json();
+        console.log(`❌ Modelo ${modelo} falhou:`, lastError);
+        response = null;
+
+      } catch (e) {
+        console.log(`❌ Erro no modelo ${modelo}:`, e.message);
+        response = null;
+      }
+    }
+
+    // Nenhum modelo funcionou
+    if (!response || !response.ok) {
+      console.error('Todos os modelos falharam. Último erro:', lastError);
+      return res.status(500).json({
+        error: 'Erro na API Gemini',
+        details: lastError,
+        dica: 'Verifique se a GEMINI_API_KEY está correta no Vercel'
+      });
     }
 
     const data = await response.json();
@@ -55,6 +85,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ content: [{ type: 'text', text }] });
 
   } catch (error) {
-    return res.status(500).json({ error: 'Erro interno do servidor' });
+    console.error('Erro interno:', error);
+    return res.status(500).json({ error: 'Erro interno do servidor', details: error.message });
   }
 }
