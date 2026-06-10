@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -11,7 +11,6 @@ export default async function handler(req, res) {
   try {
     const { messages, system, max_tokens } = req.body;
 
-    // Converte mensagens para formato OpenRouter
     const orMessages = [
       { role: 'system', content: system || '' },
       ...messages.map(m => {
@@ -39,7 +38,7 @@ export default async function handler(req, res) {
         'X-Title': 'Limpeza Segura'
       },
       body: JSON.stringify({
-        model:'meta-llama/llama-3.1-8b-instruct:free',,
+        model: 'meta-llama/llama-3.1-8b-instruct:free',
         messages: orMessages,
         max_tokens: max_tokens || 900
       })
@@ -47,17 +46,16 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const err = await response.json();
-      console.error('OpenRouter error:', err);
+      console.error('OpenRouter error:', JSON.stringify(err));
       return res.status(500).json({ error: 'Erro na API', details: err });
     }
 
     const data = await response.json();
     const text = data.choices?.[0]?.message?.content || 'Desculpe, tente novamente.';
-
     return res.status(200).json({ content: [{ type: 'text', text }] });
 
   } catch (error) {
-    console.error('Erro interno:', error);
+    console.error('Erro interno:', error.message);
     return res.status(500).json({ error: 'Erro interno', details: error.message });
   }
-}
+};
