@@ -39,7 +39,7 @@ export default async function handler(req, res) {
         'X-Title': 'Limpeza Segura'
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.0-flash-exp:free',
+        model:'meta-llama/llama-3.1-8b-instruct:free',,
         messages: orMessages,
         max_tokens: max_tokens || 900
       })
