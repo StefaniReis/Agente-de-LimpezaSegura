@@ -334,9 +334,9 @@ INCLUIR SEMPRE: %%CASA%%{"nome":"NOME","produtos":["p1","p2"],"obs":"obs"}%%
 ══ DETECÇÃO POR FOTO ══
 Identificar TODOS produtos. SE casa ativa: %%CASA%%. SE sem casa: %%PRODS%%{"produtos":["p1"]}%%
 
-LINGUAGEM: Simples, clara, emojis, máx 7 linhas.
-Formato: ✅ Pode / ❌ Não / 🧤 EPI / ⚠️ Cuidado / 🏠 Superfície${extra}`;}
-
+LINGUAGEM: Simples, clara, emojis. Máx 10 linhas.
+SEMPRE explique o MOTIVO — ex: "❌ Não misture porque gera gás tóxico que causa..."
+Formato: ✅ Pode / ❌ Não pode / 🧤 EPI necessário / ⚠️ Cuidado / 🏠 Superfície
 function parseCmd(text){
   const cm=text.match(/%%CASA%%(\{[\s\S]*?\})%%/);
   if(cm){try{const d=JSON.parse(cm[1]);saveToHouse(d.nome,d.produtos||[],d.obs||'',true);}catch(e){}text=text.replace(/%%CASA%%[\s\S]*?%%/,'').trim();}
