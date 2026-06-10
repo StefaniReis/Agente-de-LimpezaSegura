@@ -1,4 +1,3 @@
-// Backend que chama o Gemini (Google) grátis
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -6,86 +5,59 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' });
 
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY não configurada no Vercel' });
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'OPENROUTER_API_KEY não configurada' });
 
   try {
     const { messages, system, max_tokens } = req.body;
 
-    // Converte formato do app → formato Gemini
-    const geminiContents = messages.map(msg => {
-      const role = msg.role === 'assistant' ? 'model' : 'user';
-      if (Array.isArray(msg.content)) {
-        const parts = msg.content.map(c => {
-          if (c.type === 'text') return { text: c.text };
-          if (c.type === 'image') return {
-            inline_data: { mime_type: c.source.media_type, data: c.source.data }
-          };
-          return null;
-        }).filter(Boolean);
-        return { role, parts };
-      }
-      return { role, parts: [{ text: String(msg.content) }] };
-    });
-
-    // ✅ MODELOS ATUALIZADOS — tenta gemini-2.0-flash primeiro, depois outros
-    const modelos = [
-      'gemini-2.0-flash',
-      'gemini-2.0-flash-lite',
-      'gemini-1.5-flash-latest',
-      'gemini-1.5-flash-8b'
+    // Converte mensagens para formato OpenRouter
+    const orMessages = [
+      { role: 'system', content: system || '' },
+      ...messages.map(m => {
+        if (Array.isArray(m.content)) {
+          const parts = m.content.map(c => {
+            if (c.type === 'text') return { type: 'text', text: c.text };
+            if (c.type === 'image') return {
+              type: 'image_url',
+              image_url: { url: `data:${c.source.media_type};base64,${c.source.data}` }
+            };
+            return null;
+          }).filter(Boolean);
+          return { role: m.role === 'assistant' ? 'assistant' : 'user', content: parts };
+        }
+        return { role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content) };
+      })
     ];
 
-    let response = null;
-    let lastError = null;
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'HTTP-Referer': process.env.APP_URL || 'https://limpeza-segura.vercel.app',
+        'X-Title': 'Limpeza Segura'
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.0-flash-exp:free',
+        messages: orMessages,
+        max_tokens: max_tokens || 900
+      })
+    });
 
-    for (const modelo of modelos) {
-      try {
-        response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent?key=${apiKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              system_instruction: system ? { parts: [{ text: system }] } : undefined,
-              contents: geminiContents,
-              generationConfig: { maxOutputTokens: max_tokens || 900, temperature: 0.7 }
-            })
-          }
-        );
-
-        if (response.ok) {
-          console.log(`✅ Modelo funcionando: ${modelo}`);
-          break; // Achou um modelo que funciona!
-        }
-
-        lastError = await response.json();
-        console.log(`❌ Modelo ${modelo} falhou:`, lastError);
-        response = null;
-
-      } catch (e) {
-        console.log(`❌ Erro no modelo ${modelo}:`, e.message);
-        response = null;
-      }
-    }
-
-    // Nenhum modelo funcionou
-    if (!response || !response.ok) {
-      console.error('Todos os modelos falharam. Último erro:', lastError);
-      return res.status(500).json({
-        error: 'Erro na API Gemini',
-        details: lastError,
-        dica: 'Verifique se a GEMINI_API_KEY está correta no Vercel'
-      });
+    if (!response.ok) {
+      const err = await response.json();
+      console.error('OpenRouter error:', err);
+      return res.status(500).json({ error: 'Erro na API', details: err });
     }
 
     const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Desculpe, tente novamente.';
+    const text = data.choices?.[0]?.message?.content || 'Desculpe, tente novamente.';
 
     return res.status(200).json({ content: [{ type: 'text', text }] });
 
   } catch (error) {
     console.error('Erro interno:', error);
-    return res.status(500).json({ error: 'Erro interno do servidor', details: error.message });
+    return res.status(500).json({ error: 'Erro interno', details: error.message });
   }
 }
