@@ -38,7 +38,7 @@ module.exports = async function handler(req, res) {
         'X-Title': 'Limpeza Segura'
       },
       body: JSON.stringify({
-        model: 'meta-llama/llama-3.1-8b-instruct:free',
+        model: 'deepseek/deepseek-chat:free',
         messages: orMessages,
         max_tokens: max_tokens || 900
       })
